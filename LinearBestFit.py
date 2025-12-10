@@ -1,20 +1,42 @@
 #Slope (m) Formula: m = n(∑xy)−(∑x)(∑y) / n(∑x^2)−(∑x)^2​
 #Intercept (c) Formula: c = (∑y)−a(∑x) / n​
 #for linear relations, we want to use the formula y = mx + c, and to predict the line of best fit we use the least square method, which predicts where the line of best fit will be using all data points.
-grades = [5, 6 , 8, 8, 9, 1, 3, 4];
-hoursStudied = [1, 2, 2, 3, 3, 0, 1, 1];
+
+import sqlite3
+import random
+conn = sqlite3.connect('data.db');
+cursor = conn.cursor();
+create_table_sql = """
+    CREATE TABLE IF NOT EXISTS data (
+        id INTEGER PRIMARY KEY,
+        grade INTEGER,
+        hours INTEGER
+    );
+    """
+
+cursor.execute(create_table_sql)
+for i in range(1000):
+    gradesql = random.randint(0,100)
+    hoursStudiedsql = int(gradesql / 10 + random.randint(-2, 2))
+    data_to_insert = (i, gradesql, hoursStudiedsql)
+    cursor.execute("INSERT INTO data (id, grade, hours) VALUES (?, ?, ?)", data_to_insert)
+
+conn.commit()
+
 sumHoursStudied = 0;
 sumGrades = 0;
 xySum = 0
 xsqSum = 0;
 m = 0;
 c = 0
-n = len(grades);
-for i in range(len(grades)):
-    sumGrades += grades[i];
-    sumHoursStudied += hoursStudied[i];
-    xySum += grades[i] * hoursStudied[i];
-    xsqSum += hoursStudied[i] ^ 2;
+n = 1000;
+for i in range(1000):
+    cursor.execute('SELECT * FROM data WHERE id = ?', i)
+    rows = cursor.fetchall()
+    sumGrades += retrieved[1];
+    sumHoursStudied += retrieved[2];
+    xySum += retrieved[1] * retrieved[2];
+    xsqSum += retrieved[2] ^ 2;
 m = (n * (xySum) - sumHoursStudied * sumGrades) / (n * xsqSum - sumHoursStudied ^ 2);
 c = sumGrades - m * sumHoursStudied;
 def lineOfBestFit(x):
