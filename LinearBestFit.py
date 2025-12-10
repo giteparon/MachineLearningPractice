@@ -1,14 +1,15 @@
 #Slope (m) Formula: m = n(∑xy)−(∑x)(∑y) / n(∑x^2)−(∑x)^2​
 #Intercept (c) Formula: c = (∑y)−a(∑x) / n​
 #for linear relations, we want to use the formula y = mx + c, and to predict the line of best fit we use the least square method, which predicts where the line of best fit will be using all data points.
-
+import matplotlib.pyplot as plt 
+import numpy as np 
 import sqlite3
 import random
 conn = sqlite3.connect('data.db');
 cursor = conn.cursor();
 create_table_sql = """
     CREATE TABLE IF NOT EXISTS data (
-        id INTEGER PRIMARY KEY,
+        id STRING PRIMARY KEY,
         grade INTEGER,
         hours INTEGER
     );
@@ -18,7 +19,8 @@ cursor.execute(create_table_sql)
 for i in range(1000):
     gradesql = random.randint(0,100)
     hoursStudiedsql = int(gradesql / 10 + random.randint(-2, 2))
-    data_to_insert = (i, gradesql, hoursStudiedsql)
+    toInsert = f"ID{i}"
+    data_to_insert = (toInsert, gradesql, hoursStudiedsql)
     cursor.execute("INSERT INTO data (id, grade, hours) VALUES (?, ?, ?)", data_to_insert)
 
 conn.commit()
@@ -31,14 +33,16 @@ m = 0;
 c = 0
 n = 1000;
 for i in range(1000):
-    cursor.execute('SELECT * FROM data WHERE id = ?', i)
-    rows = cursor.fetchall()
-    sumGrades += retrieved[1];
-    sumHoursStudied += retrieved[2];
-    xySum += retrieved[1] * retrieved[2];
-    xsqSum += retrieved[2] ^ 2;
-m = (n * (xySum) - sumHoursStudied * sumGrades) / (n * xsqSum - sumHoursStudied ^ 2);
-c = sumGrades - m * sumHoursStudied;
+    id = f"ID{i}"
+    cursor.execute('SELECT * FROM data WHERE id = ?', (id,))
+    retrieved = cursor.fetchall()
+    sumGrades += retrieved[0][1];
+    sumHoursStudied += retrieved[0][2];
+    xySum += retrieved[0][1] * retrieved[0][2];
+    xsqSum += retrieved[0][2]** 2;
+m = ((n * xySum) - (sumHoursStudied * sumGrades)) / ((n * xsqSum) - (sumHoursStudied ** 2))
+
+c = (sumGrades / n) - (m * sumHoursStudied / n)
 def lineOfBestFit(x):
     y = m * x + c;
     print(m);
@@ -47,6 +51,7 @@ def lineOfBestFit(x):
     print(sumHoursStudied)
     return y;
 print(lineOfBestFit(2));
+
     
 
 
