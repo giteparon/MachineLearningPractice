@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np 
 import sqlite3
 import random
+graphx = []
+graphy = []
 conn = sqlite3.connect('data.db');
 cursor = conn.cursor();
 create_table_sql = """
@@ -21,6 +23,8 @@ for i in range(1000):
     hoursStudiedsql = int(gradesql / 10 + random.randint(-2, 2))
     toInsert = f"ID{i}"
     data_to_insert = (toInsert, gradesql, hoursStudiedsql)
+    graphx.append(hoursStudiedsql)
+    graphy.append(gradesql)
     cursor.execute("INSERT INTO data (id, grade, hours) VALUES (?, ?, ?)", data_to_insert)
 
 conn.commit()
@@ -51,7 +55,8 @@ def lineOfBestFit(x):
     print(sumHoursStudied)
     return y;
 print(lineOfBestFit(2));
-
+plt.plot(graphx, graphy)
+plt.show()
     
 
 
